@@ -57,23 +57,27 @@
                     return false;
                 }
             }
-
             if (!window.location.href.match(/\/shorts\//)) {
                 vid = new URL(window.location.href).searchParams.get("v");
-                if (!vid) return false;
-
+                if (!vid) {
+                    // https://www.youtube.com/embed/xxxxxx
+                    vid = window.location.href.match(/\/embed\/(.+)/);
+                    if (vid) {
+                        return origChecker(original_type);
+                    }
+                }
                 // only do new extract when current video id is different
                 if (vid == last_video_id) {
                     // get last extract result if video id is the same
                     disallowed_types = last_video_disallowed_types;
                 } else {
                     // extract & save new result
-                    if (!ytInitialPlayerResponse) return false;
+                    if (!ytInitialPlayerResponse) return origChecker(original_type);
                     disallowed_types = new Set(get_disallowed_list(vid));
                     last_video_disallowed_types = disallowed_types;
                 }
             } else {
-                if (!ytInitialPlayerResponse) return false;
+                if (!ytInitialPlayerResponse) return origChecker(original_type);
                 disallowed_types = new Set(get_disallowed_list("shorts"));
             }
 

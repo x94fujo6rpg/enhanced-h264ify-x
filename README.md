@@ -14,6 +14,9 @@ download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rp
 
 # Changelog
 
+2.2.1.7
+* bypass embed until fix
+
 2.2.1.6
 * fix shorts
 
