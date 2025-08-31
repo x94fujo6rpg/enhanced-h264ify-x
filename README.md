@@ -5,6 +5,14 @@ This extension has new features such as manual blocking of H264, VP8, VP9, AV1, 
 It works only on YouTube.
 
 # Installation
-Install for Firefox: https://addons.mozilla.org/en-US/firefox/addon/enhanced-h264ify/
+* Install for Chrome:  
+download [`enhanced-h264ify-x.crx`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.crx) and drag it into chrome
 
-Install for Chrome: https://chrome.google.com/webstore/detail/enhanced-h264ify/omkfmpieigblcllmkgbflkikinpkodlk
+* Install for Firefox:  
+download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x%20firefox.zip) in `about:debugging#/runtime/this-firefox`
+
+
+# Changelog
+
+* switch to service worker
+* fix & auto adapt to all avc1/av1 codec
