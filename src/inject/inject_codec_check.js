@@ -24,6 +24,9 @@
  */
 
 (function () {
+    let last_video_id = false;
+    let last_video_disallowed_types = false;
+
     function override() {
         // Override video element canPlayType() function
         var videoElem = document.createElement("video");
@@ -42,98 +45,131 @@
     function makeModifiedTypeChecker(origChecker) {
         // Check if a video type is allowed
         return function (type) {
+            let original_type = type;
+            let disallowed_types, vid;
             if (type === undefined) {
                 return false;
-            }
-
-            // extract all available codecs
-            let format_list = new Set();
-            let codecs_data;
-            if (ytInitialPlayerResponse) {
-                for (let data of ytInitialPlayerResponse.streamingData.adaptiveFormats) {
-                    let { mimeType } = data;
-                    let codecs = mimeType.match(/.+;\scodecs="(.+)"/);
-                    if (codecs) {
-                        format_list.add(codecs[1]);
-                    }
-                }
-            }
-
-            format_list = [...format_list];
-            codecs_data = {
-                avc: format_list.filter((code) => code.match(/avc\d+/)),
-                av1: format_list.filter((code) => code.match(/av\d+/)),
-                vp8: format_list.filter((code) => code.match(/vp8/)),
-                vp9: format_list.filter((code) => code.match(/vp9/)),
-                opus: format_list.filter((code) => code.match(/opus/)),
-                mp4a: format_list.filter((code) => code.match(/mp4a/)),
-            };
-
-            // remove empty list
-            let available_video_codec = 0;
-            let available_audio_codec = 0;
-            for (let key in codecs_data) {
-                if (codecs_data[key].length <= 0) {
-                    delete codecs_data[key];
-                } else if (["avc", "av1", "vp8", "vp9"].some((k) => key == k)) {
-                    available_video_codec += 1;
+            } else {
+                type = type.match(/.+;\s*codecs="(.+)"/);
+                if (type) {
+                    type = type[1];
                 } else {
-                    available_audio_codec += 1;
-                }
-            }
-
-            var disallowed_types = [];
-
-            // skip if only 1 codec available
-            if (available_video_codec > 1) {
-                if (localStorage["enhanced-h264ify-block_h264"] === "true") {
-                    disallowed_types.push("avc");
-                    if (codecs_data.avc) disallowed_types.push(...codecs_data.avc);
-                }
-                if (localStorage["enhanced-h264ify-block_vp8"] === "true") {
-                    disallowed_types.push("vp8");
-                    if (codecs_data.vp8) disallowed_types.push(...codecs_data.vp8);
-                }
-                if (localStorage["enhanced-h264ify-block_vp9"] === "true") {
-                    disallowed_types.push("vp9", "vp09");
-                    if (codecs_data.vp9) disallowed_types.push(...codecs_data.vp9);
-                }
-                if (localStorage["enhanced-h264ify-block_av1"] === "true") {
-                    disallowed_types.push("av01", "av99");
-                    if (codecs_data.av1) disallowed_types.push(...codecs_data.av1);
-                }
-            }
-
-            // skip if only 1 codec available
-            if (available_audio_codec > 1) {
-                if (localStorage["enhanced-h264ify-block_opus"] === "true") {
-                    disallowed_types.push("opus");
-                    if (codecs_data.opus) disallowed_types.push(...codecs_data.opus);
-                }
-                if (localStorage["enhanced-h264ify-block_mp4a"] === "true") {
-                    disallowed_types.push("mp4a");
-                    if (codecs_data.mp4a) disallowed_types.push(...codecs_data.mp4a);
-                }
-            }
-
-            // If video type is in disallowed_types, say we don't support them
-            for (var i = 0; i < disallowed_types.length; i++) {
-                if (type.indexOf(disallowed_types[i]) !== -1) {
                     return false;
                 }
             }
 
+            vid = new URL(window.location.href).searchParams.get("v");
+            if (!vid) return false;
+
+            // only do new extract when current video id is different
+            if (vid == last_video_id) {
+                // get last extract result if video id is the same
+                disallowed_types = last_video_disallowed_types;
+            } else {
+                // extract & save new result
+                if (!ytInitialPlayerResponse) return false;
+                disallowed_types = new Set(get_disallowed_list(vid));
+                last_video_disallowed_types = disallowed_types;
+            }
+
+            // If video type is in disallowed_types, say we don't support them
+            if (disallowed_types.has(type)) {
+                return false;
+            }
+
             if (localStorage["enhanced-h264ify-block_60fps"] === "true") {
-                var match = /framerate=(\d+)/.exec(type);
+                let match = /framerate=(\d+)/.exec(original_type);
                 if (match && match[1] > 30) {
                     return false;
                 }
             }
 
             // Otherwise, ask the browser
-            return origChecker(type);
+            return origChecker(original_type);
         };
     }
 
     override();
+
+    function get_disallowed_list(_vid) {
+        let format_list = new Set();
+        let codecs_data;
+
+        for (let data of ytInitialPlayerResponse.streamingData.adaptiveFormats) {
+            let { mimeType } = data;
+            let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
+            if (codecs) format_list.add(codecs[1]);
+        }
+        format_list = [...format_list].join("\n");
+
+        codecs_data = {
+            avc: format_list.match(/^avc\d+.*/gm),
+            av1: format_list.match(/^av\d+.*/gm),
+            vp8: format_list.match(/^vp8.*/gm),
+            vp9: format_list.match(/^vp9.*/gm),
+            opus: format_list.match(/^opus/gm),
+            mp4a: format_list.match(/^mp4a/gm),
+        };
+
+        // remove empty list & count available codec
+        let available_video_codec = 0;
+        let available_audio_codec = 0;
+        for (let [key, arr] of Object.entries(codecs_data)) {
+            if (!arr) {
+                delete codecs_data[key];
+            } else if (["opus", "mp4a"].some((_key) => key == _key)) {
+                available_audio_codec++;
+            } else {
+                available_video_codec++;
+            }
+        }
+
+        // save current video id & reset disallowed_types
+        last_video_id = _vid;
+        last_video_disallowed_types = false;
+        console.log(`new video id:[${_vid}], codecs_data:`, codecs_data);
+
+        let disallowed_types = [];
+
+        // skip if only 1 codec available
+        if (available_video_codec > 1) {
+            let codecs_map = {
+                avc: "h264",
+                av1: "av1",
+                vp8: "vp8",
+                vp9: "vp9",
+            };
+            for (let [_key, _name] of Object.entries(codecs_map)) {
+                if (localStorage[`enhanced-h264ify-block_${_name}`] === "true") {
+                    if (codecs_data[_key]) {
+                        disallowed_types.push(...codecs_data[_key]);
+                        available_video_codec--;
+                    }
+                    // abort when only 1 codec left
+                    if (available_video_codec <= 1) break;
+                }
+            }
+        }
+
+        // skip if only 1 codec available
+        if (available_audio_codec > 1) {
+            let codecs_map = {
+                opus: "opus",
+                mp4a: "mp4a",
+            };
+            for (let [_key, _name] of Object.entries(codecs_map)) {
+                if (localStorage[`enhanced-h264ify-block_${_name}`] === "true") {
+                    if (codecs_data[_key]) {
+                        disallowed_types.push(...codecs_data[_key]);
+                        available_audio_codec--;
+                    }
+                    // abort when only 1 codec left
+                    if (available_audio_codec <= 1) break;
+                }
+            }
+        }
+
+        console.log("disallowed_types", disallowed_types);
+        return disallowed_types;
+    }
 })();

@@ -14,6 +14,15 @@ download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rp
 
 # Changelog
 
+2.2.1.5
+* improved performance (only extract data once per video)
+
+2.2.1.4
+* abort when only 1 video/audio codec available
+* stop when only 1 video/audio codec left
+
+2.2.1.3
 * switch to service worker
-* fix & auto adapt to all avc1/av1 codec
-* atuo abort when there is only 1 video/audio codec
+
+fork
+* fix & auto adapt to all codec
