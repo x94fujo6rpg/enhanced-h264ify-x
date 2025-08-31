@@ -23,38 +23,39 @@
  * SOFTWARE.
  */
 
-function useActualVolumeLevel() {
+(function () {
+    function useActualVolumeLevel() {
+        if (localStorage["enhanced-h264ify-disable_LN"] !== "true") {
+            return;
+        }
 
-  if (localStorage['enhanced-h264ify-disable_LN'] !== 'true') {
-    return;
-  }
+        const volumePanelConfig = { attributes: true };
+        const documentConfig = { childList: true, subtree: true };
 
-  const volumePanelConfig = { attributes: true };
-  const documentConfig = { childList: true, subtree: true };
+        const onVolumeChange = (mutationList) => {
+            const attr = "aria-valuenow";
+            for (let mutation of mutationList) {
+                if (mutation.attributeName == attr) {
+                    // Get current volume level from player's attribute
+                    // and set the actual volume
+                    const video = document.querySelector("video");
+                    video.volume = mutation.target.attributes[attr].value / 100;
+                }
+            }
+        };
 
-  const onVolumeChange = (mutationList) => {
-    const attr = 'aria-valuenow';
-    for (let mutation of mutationList) {
-      if (mutation.attributeName == attr) {
-        // Get current volume level from player's attribute
-        // and set the actual volume
-        const video = document.querySelector('video');
-        video.volume = mutation.target.attributes[attr].value / 100;
-      }
+        const onVolumePanelAppear = (mutationList, thisObserver) => {
+            const volumePanel = document.querySelector(".ytp-volume-panel");
+            if (volumePanel) {
+                const observer = new MutationObserver(onVolumeChange);
+                observer.observe(volumePanel, volumePanelConfig);
+                thisObserver.disconnect();
+            }
+        };
+
+        const documentObserver = new MutationObserver(onVolumePanelAppear);
+        documentObserver.observe(document.body, documentConfig);
     }
-  }
 
-  const onVolumePanelAppear = (mutationList, thisObserver) => {
-    const volumePanel = document.querySelector('.ytp-volume-panel');
-    if (volumePanel) {
-        const observer = new MutationObserver(onVolumeChange);
-        observer.observe(volumePanel, volumePanelConfig);
-        thisObserver.disconnect();
-    }
-  }
-
-  const documentObserver = new MutationObserver(onVolumePanelAppear);
-  documentObserver.observe(document.body, documentConfig);
-}
-
-useActualVolumeLevel();
+    useActualVolumeLevel();
+})();
