@@ -14,6 +14,9 @@ download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rp
 
 # Changelog
 
+2.2.1.6
+* fix shorts
+
 2.2.1.5
 * improved performance (only extract data once per video)
 

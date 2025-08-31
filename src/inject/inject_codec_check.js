@@ -58,18 +58,23 @@
                 }
             }
 
-            vid = new URL(window.location.href).searchParams.get("v");
-            if (!vid) return false;
+            if (!window.location.href.match(/\/shorts\//)) {
+                vid = new URL(window.location.href).searchParams.get("v");
+                if (!vid) return false;
 
-            // only do new extract when current video id is different
-            if (vid == last_video_id) {
-                // get last extract result if video id is the same
-                disallowed_types = last_video_disallowed_types;
+                // only do new extract when current video id is different
+                if (vid == last_video_id) {
+                    // get last extract result if video id is the same
+                    disallowed_types = last_video_disallowed_types;
+                } else {
+                    // extract & save new result
+                    if (!ytInitialPlayerResponse) return false;
+                    disallowed_types = new Set(get_disallowed_list(vid));
+                    last_video_disallowed_types = disallowed_types;
+                }
             } else {
-                // extract & save new result
                 if (!ytInitialPlayerResponse) return false;
-                disallowed_types = new Set(get_disallowed_list(vid));
-                last_video_disallowed_types = disallowed_types;
+                disallowed_types = new Set(get_disallowed_list("shorts"));
             }
 
             // If video type is in disallowed_types, say we don't support them
@@ -127,7 +132,6 @@
         // save current video id & reset disallowed_types
         last_video_id = _vid;
         last_video_disallowed_types = false;
-        console.log(`new video id:[${_vid}], codecs_data:`, codecs_data);
 
         let disallowed_types = [];
 
@@ -169,7 +173,11 @@
             }
         }
 
-        console.log("disallowed_types", disallowed_types);
+        if (_vid != "shorts") {
+            console.log(`new video id:[${_vid}], codecs_data:`, codecs_data);
+            console.log("disallowed_types", disallowed_types);
+        }
+
         return disallowed_types;
     }
 })();
