@@ -16,3 +16,4 @@ download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rp
 
 * switch to service worker
 * fix & auto adapt to all avc1/av1 codec
+* atuo abort when there is only 1 video/audio codec

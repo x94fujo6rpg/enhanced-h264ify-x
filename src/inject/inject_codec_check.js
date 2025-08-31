@@ -70,36 +70,50 @@
             };
 
             // remove empty list
+            let available_video_codec = 0;
+            let available_audio_codec = 0;
             for (let key in codecs_data) {
                 if (codecs_data[key].length <= 0) {
                     delete codecs_data[key];
+                } else if (["avc", "av1", "vp8", "vp9"].some((k) => key == k)) {
+                    available_video_codec += 1;
+                } else {
+                    available_audio_codec += 1;
                 }
             }
 
             var disallowed_types = [];
-            if (localStorage["enhanced-h264ify-block_h264"] === "true") {
-                disallowed_types.push("avc");
-                if (codecs_data.avc) disallowed_types.push(...codecs_data.avc);
+
+            // skip if only 1 codec available
+            if (available_video_codec > 1) {
+                if (localStorage["enhanced-h264ify-block_h264"] === "true") {
+                    disallowed_types.push("avc");
+                    if (codecs_data.avc) disallowed_types.push(...codecs_data.avc);
+                }
+                if (localStorage["enhanced-h264ify-block_vp8"] === "true") {
+                    disallowed_types.push("vp8");
+                    if (codecs_data.vp8) disallowed_types.push(...codecs_data.vp8);
+                }
+                if (localStorage["enhanced-h264ify-block_vp9"] === "true") {
+                    disallowed_types.push("vp9", "vp09");
+                    if (codecs_data.vp9) disallowed_types.push(...codecs_data.vp9);
+                }
+                if (localStorage["enhanced-h264ify-block_av1"] === "true") {
+                    disallowed_types.push("av01", "av99");
+                    if (codecs_data.av1) disallowed_types.push(...codecs_data.av1);
+                }
             }
-            if (localStorage["enhanced-h264ify-block_vp8"] === "true") {
-                disallowed_types.push("vp8");
-                if (codecs_data.vp8) disallowed_types.push(...codecs_data.vp8);
-            }
-            if (localStorage["enhanced-h264ify-block_vp9"] === "true") {
-                disallowed_types.push("vp9", "vp09");
-                if (codecs_data.vp9) disallowed_types.push(...codecs_data.vp9);
-            }
-            if (localStorage["enhanced-h264ify-block_av1"] === "true") {
-                disallowed_types.push("av01", "av99");
-                if (codecs_data.av1) disallowed_types.push(...codecs_data.av1);
-            }
-            if (localStorage["enhanced-h264ify-block_opus"] === "true") {
-                disallowed_types.push("opus");
-                if (codecs_data.opus) disallowed_types.push(...codecs_data.opus);
-            }
-            if (localStorage["enhanced-h264ify-block_mp4a"] === "true") {
-                disallowed_types.push("mp4a");
-                if (codecs_data.mp4a) disallowed_types.push(...codecs_data.mp4a);
+
+            // skip if only 1 codec available
+            if (available_audio_codec > 1) {
+                if (localStorage["enhanced-h264ify-block_opus"] === "true") {
+                    disallowed_types.push("opus");
+                    if (codecs_data.opus) disallowed_types.push(...codecs_data.opus);
+                }
+                if (localStorage["enhanced-h264ify-block_mp4a"] === "true") {
+                    disallowed_types.push("mp4a");
+                    if (codecs_data.mp4a) disallowed_types.push(...codecs_data.mp4a);
+                }
             }
 
             // If video type is in disallowed_types, say we don't support them
