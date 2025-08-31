@@ -15,7 +15,7 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "default_title": "enhanced-h264ify",
+    "default_title": "enhanced-h264ify-x",
     "default_popup": "options.html"
   },
   "background": {
