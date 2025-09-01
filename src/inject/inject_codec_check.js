@@ -155,7 +155,6 @@
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
             if (codecs) format_list.add(codecs[1]);
         }
-        ["avc", "av1", "av01", "vp8", "vp9", "vp09"].forEach((c) => format_list.add(c));
 
         format_list = [...format_list].join("\n");
 
@@ -175,8 +174,10 @@
             if (!arr) {
                 delete codecs_data[key];
             } else if (["opus", "mp4a"].some((_key) => key == _key)) {
+                codecs_data[key] = [...new Set(arr).add(key)]; // add default codec name to remain one
                 available_audio_codec++;
             } else {
+                codecs_data[key] = [...new Set(arr).add(key)]; // add default codec name to remain one
                 available_video_codec++;
             }
         }
