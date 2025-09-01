@@ -57,28 +57,30 @@
                     return false;
                 }
             }
-            if (!window.location.href.match(/\/shorts\//)) {
-                vid = new URL(window.location.href).searchParams.get("v");
-                if (!vid) {
-                    // https://www.youtube.com/embed/xxxxxx
-                    vid = window.location.href.match(/\/embed\/(.+)/);
-                    if (vid) {
-                        return origChecker(original_type);
-                    }
-                }
-                // only do new extract when current video id is different
-                if (vid == last_video_id) {
-                    // get last extract result if video id is the same
-                    disallowed_types = last_video_disallowed_types;
+
+            // https://www.youtube.com/watch?v=xxxxx
+            vid = new URL(window.location.href).searchParams.get("v");
+            if (!vid) {
+                // https://www.youtube.com//shorts/xxxxx
+                // https://www.youtube.com/embed/xxxxxx
+                vid = window.location.href.match(/\/shorts\/([^?]+)/) || window.location.href.match(/\/embed\/([^?]+)/);
+                if (vid) {
+                    vid = vid[1];
                 } else {
-                    // extract & save new result
-                    if (!ytInitialPlayerResponse) return origChecker(original_type);
-                    disallowed_types = new Set(get_disallowed_list(vid));
-                    last_video_disallowed_types = disallowed_types;
+                    return origChecker(original_type);
                 }
+            }
+
+            // only do new extract when current video id is different
+            if (vid == last_video_id) {
+                // get last extract result if video id is the same
+                disallowed_types = last_video_disallowed_types;
             } else {
-                if (!ytInitialPlayerResponse) return origChecker(original_type);
-                disallowed_types = new Set(get_disallowed_list("shorts"));
+                // extract & save new result
+                disallowed_types = get_disallowed_list(vid);
+                if (!disallowed_types) return origChecker(original_type);
+                disallowed_types = new Set(disallowed_types);
+                last_video_disallowed_types = disallowed_types;
             }
 
             // If video type is in disallowed_types, say we don't support them
@@ -100,11 +102,47 @@
 
     override();
 
+    function get_video_info_sync(vid) {
+        if (!vid) {
+            resolve(false);
+            return;
+        }
+
+        let request = new XMLHttpRequest();
+        request.open("POST", "https://www.youtube.com/youtubei/v1/player", false);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send(
+            JSON.stringify({
+                context: {
+                    client: {
+                        clientName: "WEB",
+                        clientVersion: "2.20230327.07.00",
+                    },
+                },
+                videoId: vid,
+            })
+        );
+
+        if (request.status == 200) {
+            let response = JSON.parse(request.responseText);
+            return response.streamingData.adaptiveFormats;
+        } else {
+            return false;
+        }
+    }
+
     function get_disallowed_list(_vid) {
         let format_list = new Set();
         let codecs_data;
+        let format_data;
+        if (ytInitialPlayerResponse) {
+            format_data = ytInitialPlayerResponse.streamingData.adaptiveFormats;
+        } else {
+            format_data = get_video_info_sync(_vid);
+        }
+        if (!format_data || !format_data.length) return false;
 
-        for (let data of ytInitialPlayerResponse.streamingData.adaptiveFormats) {
+        for (let data of format_data) {
             let { mimeType } = data;
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
             if (codecs) format_list.add(codecs[1]);
