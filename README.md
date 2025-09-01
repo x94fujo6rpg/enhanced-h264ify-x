@@ -14,6 +14,16 @@ download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rp
 
 # Changelog
 
+2.2.1.9
+* sneaky unlisted format workaround 
+  like:
+  ```
+  vp09.02.51.10.01.09.16.09.00
+  vp09.02.51.10.01.09.99.99.00
+  vp09.00.51.08.01.01.01.01.00
+  ...
+  ```
+
 2.2.1.8
 * fix embed
 

@@ -88,6 +88,14 @@
                 return false;
             }
 
+            // sneaky unlisted format workaround
+            if (disallowed_types.has("avc") && type.match(/avc\d+/)) return false;
+            if (disallowed_types.has("av1") && type.match(/av\d+/)) return false;
+            if (disallowed_types.has("vp8") && type.match(/vp8/)) return false;
+            if (disallowed_types.has("vp9") && type.match(/vp9|vp09/)) return false;
+            if (disallowed_types.has("opus") && type.match(/opus/)) return false;
+            if (disallowed_types.has("mp4a") && type.match(/mp4a/)) return false;
+
             if (localStorage["enhanced-h264ify-block_60fps"] === "true") {
                 let match = /framerate=(\d+)/.exec(original_type);
                 if (match && match[1] > 30) {
@@ -147,13 +155,15 @@
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
             if (codecs) format_list.add(codecs[1]);
         }
+        ["avc", "av1", "av01", "vp8", "vp9", "vp09"].forEach((c) => format_list.add(c));
+
         format_list = [...format_list].join("\n");
 
         codecs_data = {
             avc: format_list.match(/^avc\d+.*/gm),
             av1: format_list.match(/^av\d+.*/gm),
             vp8: format_list.match(/^vp8.*/gm),
-            vp9: format_list.match(/^vp9.*/gm),
+            vp9: format_list.match(/^vp9.*|^vp09.*/gm),
             opus: format_list.match(/^opus/gm),
             mp4a: format_list.match(/^mp4a/gm),
         };
