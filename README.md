@@ -8,6 +8,9 @@ It works only on YouTube.
 * Install for Chrome:  
 download [`enhanced-h264ify-x.crx`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.crx) and drag it into chrome
 
+* Install for Edge:  
+download [`enhanced-h264ify-x.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.zip) and drag it into chrome
+
 * Install for Firefox:  
 download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x%20firefox.zip) in `about:debugging#/runtime/this-firefox`
 
