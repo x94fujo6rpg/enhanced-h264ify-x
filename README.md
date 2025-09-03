@@ -6,19 +6,32 @@ It works only on YouTube.
 
 # Installation
 * Install for Chrome:  
-download [`enhanced-h264ify-x.crx`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.crx) and drag it into chrome
-
+download [`enhanced-h264ify-x.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.zip) and drag it into `chrome://extensions/`  
+  
 * Install for Edge:  
-download [`enhanced-h264ify-x.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.zip) and drag it into chrome
-
+download [`enhanced-h264ify-x.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.zip) and drag it into `edge://extensions/`  
+  
 * Install for Firefox:  
-download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x%20firefox.zip) in `about:debugging#/runtime/this-firefox`
+download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x%20firefox.zip) in `about:debugging#/runtime/this-firefox`  
+you need to reinstall it every time you restart firefox  
+because firefox hate dev  
+add-ons won't work properly unless it's verified on AMO  
+even though they have fewer staff to do the review process  
+make it take 1 week to few month  
+there's nothing I can do  
 
+# Improved
+
+pull video info & get all available codecs  
+auto stop block video codec when only 1 video codec available/left (prevent playback error)  
+auto stop block audio codec when only 1 audio codec available/left (prevent playback error)  
+
+\*youtube doesn't like you only allowing av1
 
 # Changelog
 
 2.2.1.9
-* sneaky unlisted format workaround 
+* sneaky unlisted format workaround  
   like:
   ```
   vp09.02.51.10.01.09.16.09.00

@@ -112,8 +112,7 @@
 
     function get_video_info_sync(vid) {
         if (!vid) {
-            resolve(false);
-            return;
+            return false;
         }
 
         let request = new XMLHttpRequest();
@@ -226,10 +225,8 @@
             }
         }
 
-        if (_vid != "shorts") {
-            console.log(`new video id:[${_vid}], codecs_data:`, codecs_data);
-            console.log("disallowed_types", disallowed_types);
-        }
+        console.log(`new video id:[${_vid}], codecs_data:`, codecs_data);
+        console.log("disallowed_types", disallowed_types);
 
         return disallowed_types;
     }
