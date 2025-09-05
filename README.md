@@ -12,6 +12,7 @@ download [`enhanced-h264ify-x.zip`](https://github.com/x94fujo6rpg/enhanced-h264
 download [`enhanced-h264ify-x.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x.zip) and drag it into `edge://extensions/`  
   
 * Install for Firefox:  
+install it on [AMO enhanced-h264ify-x](https://addons.mozilla.org/firefox/addon/enhanced-h264ify-x/) (possible older version because it requires review)  
 download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x%20firefox.zip) in `about:debugging#/runtime/this-firefox`  
 you need to reinstall it every time you restart firefox  
 because firefox hate dev  
