@@ -40,6 +40,14 @@
     "message": "Disable Loudness Normalization"
   },
 
+  "optionsMax_res": {
+    "message": "Don't block codec<br />　　If max resolution is lower than:"
+  },
+
+  "optionsRes_max": {
+    "message": "Highest available(Adaptive)"
+  },
+
   "optionsTitleVideo": {
     "message": "Video"
   },

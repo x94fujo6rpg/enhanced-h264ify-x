@@ -40,6 +40,14 @@
     "message": "Zakázat normalizaci hlasitosti"
   },
 
+  "optionsMax_res": {
+    "message": "Neblokovat kodek<br />　　Pokud je maximální rozlišení nižší než"
+  },
+
+  "optionsRes_max": {
+    "message": "Nejvyšší dostupné (Adaptivní)"
+  },
+
   "optionsTitleVideo": {
     "message": "Video"
   },

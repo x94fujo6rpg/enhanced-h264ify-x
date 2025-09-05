@@ -184,11 +184,18 @@
         };
 
         // check resolution. discard if it doesn't support max_resolution.
-        console.log("max_resolution", max_resolution, "resolution_data", resolution_data);
-        for (let [key, height] of Object.entries(resolution_data)) {
-            if (height < max_resolution) {
-                console.log(`${key} lacks ${max_resolution}p info. discard ${key} from exclusion list.`);
-                delete codecs_data[key];
+        if (localStorage["enhanced-h264ify-max_res"] === "true") {
+            // override if not set to max
+            if (localStorage["enhanced-h264ify-res_setting"] !== "max") {
+                max_resolution = parseInt(localStorage["enhanced-h264ify-res_setting"], 10);
+            }
+            console.log("max_resolution", max_resolution, "resolution_data", resolution_data);
+            for (let [key, height] of Object.entries(resolution_data)) {
+                if (max_resolution > height) {
+                    if (height > 0)
+                        console.log(`${key} lacks ${max_resolution}p info. discard ${key} from exclusion list.`);
+                    delete codecs_data[key];
+                }
             }
         }
 

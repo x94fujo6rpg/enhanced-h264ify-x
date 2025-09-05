@@ -52,6 +52,12 @@ if (localStorage['enhanced-h264ify-block_mp4a'] === undefined) {
 if (localStorage['enhanced-h264ify-disable_LN'] === undefined) {
   localStorage['enhanced-h264ify-disable_LN'] = false;
 }
+if (localStorage['enhanced-h264ify-max_res'] === undefined) {
+  localStorage['enhanced-h264ify-max_res'] = true;
+}
+if (localStorage['enhanced-h264ify-res_setting'] === undefined) {
+  localStorage['enhanced-h264ify-res_setting'] = "1080";
+}
 
 // Cache chrome.storage.local options in localStorage.
 // This is needed because chrome.storage.local.get() is async and we want to
@@ -66,7 +72,9 @@ chrome.storage.local.get({
   block_av1: true,
   block_opus: false,
   block_mp4a: false,
-  disable_LN: false
+  disable_LN: false,
+  max_res: true,
+  res_setting: "1080"
  }, function(options) {
    localStorage['enhanced-h264ify-block_60fps'] = options.block_60fps;
    localStorage['enhanced-h264ify-block_h264'] = options.block_h264;
@@ -76,6 +84,8 @@ chrome.storage.local.get({
    localStorage['enhanced-h264ify-block_opus'] = options.block_opus;
    localStorage['enhanced-h264ify-block_mp4a'] = options.block_mp4a;
    localStorage['enhanced-h264ify-disable_LN'] = options.disable_LN;
+   localStorage['enhanced-h264ify-max_res'] = options.max_res;
+   localStorage['enhanced-h264ify-res_setting'] = options.res_setting;
  }
 );
 

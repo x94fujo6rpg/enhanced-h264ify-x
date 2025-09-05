@@ -25,15 +25,27 @@ there's nothing I can do
 
 pull video info & get all available codecs  
 auto stop block video codec when only 1 video codec available/left (prevent playback error)  
-auto stop when the specified codec does not have max resolution that video supports  
 auto stop block audio codec when only 1 audio codec available/left (prevent playback error)  
 
-\*youtube doesn't like you only allowing av1
+* Optional  
+don't block if the codec's resolution(360~1080 or highest) is unavailable  
+
+\*youtube don't like you only allowing/force av1  
 
 # Changelog
 
+2.2.1.13
+* language support: `zh_TW, zh_CN`
+* new option: 
+  * `Don't block codec If max resolution is lower than:` 
+    * Highest available(Adaptive)
+    * 1080p
+    * 720p
+    * 480p
+    * 360p
+
 2.2.1.12
-* auto stop when the specified codec does not have max resolution that video supports
+* ~~auto~~ stop when the specified codec does not have max resolution that video supports
 
 2.2.1.9
 * sneaky unlisted format workaround  
@@ -49,7 +61,7 @@ auto stop block audio codec when only 1 audio codec available/left (prevent play
 * fix embed
 
 2.2.1.7
-* bypass embed until fix
+* ~~bypass embed until fix~~
 
 2.2.1.6
 * fix shorts

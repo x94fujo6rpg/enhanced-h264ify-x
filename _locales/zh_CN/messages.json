@@ -1,0 +1,58 @@
+{
+  "extensionDescription": {
+    "message": "阻擋不想要的Youtube編碼",
+    "description": "Extension description"
+  },
+
+  "optionsTitle": {
+    "message": "enhanced-h264ify"
+  },
+
+  "optionsBlock60fps": {
+    "message": "阻擋 60fps"
+  },
+
+  "optionsBlockH264": {
+    "message": "阻擋 h264 (AVC)"
+  },
+
+  "optionsBlockVP8": {
+    "message": "阻擋 VP8"
+  },
+
+  "optionsBlockVP9": {
+    "message": "阻擋 VP9"
+  },
+
+  "optionsBlockAV1": {
+    "message": "阻擋 AV1"
+  },
+
+  "optionsBlockOpus": {
+    "message": "阻擋 Opus"
+  },
+
+  "optionsBlockMP4A": {
+    "message": "阻擋 AAC (MP4A)"
+  },
+
+  "optionsDisableLN": {
+    "message": "停用響度均衡"
+  },
+
+  "optionsMax_res": {
+    "message": "停止阻擋如果<br />　編碼最高解析度小於:"
+  },
+
+  "optionsRes_max": {
+    "message": "最高可用(自適應)"
+  },
+
+  "optionsTitleVideo": {
+    "message": "影片"
+  },
+
+  "optionsTitleAudio": {
+    "message": "音訊"
+  }
+}
