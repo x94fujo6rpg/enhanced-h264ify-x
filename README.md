@@ -25,7 +25,7 @@ there's nothing I can do
 
 pull video info & get all available codecs  
 auto stop block video codec when only 1 video codec available/left (prevent playback error)  
-auto stop when the specified codec does not have max resolution that video supports
+auto stop when the specified codec does not have max resolution that video supports  
 auto stop block audio codec when only 1 audio codec available/left (prevent playback error)  
 
 \*youtube doesn't like you only allowing av1
