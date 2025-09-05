@@ -142,6 +142,13 @@
         let format_list = new Set();
         let codecs_data;
         let format_data;
+        let resolution_data = {
+            avc: 0,
+            av1: 0,
+            vp8: 0,
+            vp9: 0,
+        };
+        let max_resolution = 0;
         if (ytInitialPlayerResponse) {
             format_data = ytInitialPlayerResponse.streamingData.adaptiveFormats;
         } else {
@@ -150,9 +157,19 @@
         if (!format_data || !format_data.length) return false;
 
         for (let data of format_data) {
-            let { mimeType } = data;
+            let { mimeType, height } = data;
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
-            if (codecs) format_list.add(codecs[1]);
+            if (codecs) {
+                codecs = codecs[1];
+                format_list.add(codecs);
+                if (height) {
+                    if (codecs.match(/^avc\d+.*/) && resolution_data.avc < height) resolution_data.avc = height;
+                    if (codecs.match(/^av\d+.*/) && resolution_data.av1 < height) resolution_data.av1 = height;
+                    if (codecs.match(/^vp8.*/) && resolution_data.vp8 < height) resolution_data.vp8 = height;
+                    if (codecs.match(/^vp9.*|^vp09.*/) && resolution_data.vp9 < height) resolution_data.vp9 = height;
+                    if (height > max_resolution) max_resolution = height;
+                }
+            }
         }
 
         format_list = [...format_list].join("\n");
@@ -165,6 +182,15 @@
             opus: format_list.match(/^opus/gm),
             mp4a: format_list.match(/^mp4a/gm),
         };
+
+        // check resolution. discard if it doesn't support max_resolution.
+        console.log("max_resolution", max_resolution, "resolution_data", resolution_data);
+        for (let [key, height] of Object.entries(resolution_data)) {
+            if (height < max_resolution) {
+                console.log(`${key} lacks ${max_resolution}p info. discard ${key} from exclusion list.`);
+                delete codecs_data[key];
+            }
+        }
 
         // remove empty list & count available codec
         let available_video_codec = 0;
