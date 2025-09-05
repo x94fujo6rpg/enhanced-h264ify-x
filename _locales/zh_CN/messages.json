@@ -41,7 +41,7 @@
   },
 
   "optionsMax_res": {
-    "message": "停止阻擋如果<br />　編碼最高解析度小於:"
+    "message": "停止阻擋如果編碼最高解析度小於:"
   },
 
   "optionsRes_max": {

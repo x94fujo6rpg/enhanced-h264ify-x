@@ -41,7 +41,7 @@
   },
 
   "optionsMax_res": {
-    "message": "Don't block codec<br />　　If max resolution is lower than:"
+    "message": "Don't block codec If max resolution is lower than:"
   },
 
   "optionsRes_max": {
