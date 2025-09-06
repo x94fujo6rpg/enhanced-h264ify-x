@@ -150,6 +150,10 @@
         };
         let max_resolution = 0;
         if (ytInitialPlayerResponse) {
+            if (ytInitialPlayerResponse.playabilityStatus.status != "OK") {
+                // not playable video like offline live stream
+                return false;
+            }
             format_data = ytInitialPlayerResponse.streamingData.adaptiveFormats;
         } else {
             format_data = get_video_info_sync(_vid);
