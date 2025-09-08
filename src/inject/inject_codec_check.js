@@ -88,12 +88,8 @@
 
             // If video type is in disallowed_types, say we don't support them
             // sneaky unlisted format workaround
-            if (disallowed_types.has("avc") && type.match(/avc\d+/)) return false;
-            if (disallowed_types.has("av1") && type.match(/av\d+/)) return false;
-            if (disallowed_types.has("vp8") && type.match(/vp8/)) return false;
-            if (disallowed_types.has("vp9") && type.match(/vp9|vp09/)) return false;
-            if (disallowed_types.has("opus") && type.match(/opus/)) return false;
-            if (disallowed_types.has("mp4a") && type.match(/mp4a/)) return false;
+            let reg_match_codec = codecs_util.get_reg_match(type);
+            if (disallowed_types.has(reg_match_codec)) return false;
 
             if (localStorage["enhanced-h264ify-block_60fps"] === "true") {
                 let match = /framerate=(\d+)/.exec(original_type);
@@ -137,6 +133,40 @@
             return list instanceof Array ? list : false;
         },
     };
+    const codecs_util = {
+        video_list: ["avc", "av1", "vp8", "vp9"],
+        audio_list: ["opus", "mp4a"],
+        all_format: ["avc", "av1", "vp8", "vp9", "opus", "mp4a"],
+        // map to codec config name
+        video_map: {
+            avc: "h264",
+            av1: "av1",
+            vp8: "vp8",
+            vp9: "vp9",
+        },
+        audio_map: {
+            opus: "opus",
+            mp4a: "mp4a",
+        },
+        reg: {
+            avc: /avc\d+/,
+            av1: /av\d+/,
+            vp8: /vp8/,
+            vp9: /vp9|vp09/,
+            opus: /opus/,
+            mp4a: /mp4a/,
+        },
+        get_reg_match(string = "") {
+            for (let [key, reg] of Object.entries(this.reg)) {
+                if (string.match(reg)) return key;
+            }
+            console.log(`no reg match for [${string}]`);
+            return false;
+        },
+        is_audio(string = "") {
+            return this.audio_list.some((_key) => _key == string);
+        },
+    };
 
     function get_video_info_sync(vid) {
         if (!vid) {
@@ -166,17 +196,7 @@
     }
 
     function get_disallowed_list(_vid) {
-        let format_list = new Set();
-        let codecs_data;
-        let format_data;
-        let resolution_data = {
-            avc: 0,
-            av1: 0,
-            vp8: 0,
-            vp9: 0,
-        };
-        let max_resolution = 0;
-        format_data = get_video_info_sync(_vid);
+        let format_data = get_video_info_sync(_vid);
         if (
             !format_data ||
             !format_data.streamingData ||
@@ -188,35 +208,27 @@
         }
         format_data = format_data.streamingData.adaptiveFormats;
 
-        let table = [];
+        // extract codecs & resolution info
+        let resolution_data = codecs_util.video_list.reduce((acc, current) => ({ ...acc, [current]: 0 }), {}),
+            codecs_data = codecs_util.all_format.reduce((acc, current) => ({ ...acc, [current]: new Set() }), {}),
+            max_resolution = 0,
+            table = []; // for log
         for (let data of format_data) {
             let { mimeType, width, height, qualityLabel, averageBitrate, bitrate } = data;
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
             if (codecs) {
                 codecs = codecs[1];
-                format_list.add(codecs);
+                let codec_key = codecs_util.get_reg_match(codecs);
+                codecs_data[codec_key].add(codecs);
+                // video resolution info
                 if (height) {
-                    if (codecs.match(/^avc\d+.*/) && resolution_data.avc < height) resolution_data.avc = height;
-                    if (codecs.match(/^av\d+.*/) && resolution_data.av1 < height) resolution_data.av1 = height;
-                    if (codecs.match(/^vp8.*/) && resolution_data.vp8 < height) resolution_data.vp8 = height;
-                    if (codecs.match(/^vp9.*|^vp09.*/) && resolution_data.vp9 < height) resolution_data.vp9 = height;
                     if (height > max_resolution) max_resolution = height;
+                    if (height > resolution_data[codec_key]) resolution_data[codec_key] = height;
                     table.push({ mimeType, width, height, qualityLabel, averageBitrate, bitrate });
                 }
             }
         }
         console.table(table);
-
-        format_list = [...format_list].join("\n");
-
-        codecs_data = {
-            avc: format_list.match(/^avc\d+.*/gm),
-            av1: format_list.match(/^av\d+.*/gm),
-            vp8: format_list.match(/^vp8.*/gm),
-            vp9: format_list.match(/^vp9.*|^vp09.*/gm),
-            opus: format_list.match(/^opus/gm),
-            mp4a: format_list.match(/^mp4a/gm),
-        };
 
         // check resolution. discard if it doesn't support max_resolution.
         if (localStorage["enhanced-h264ify-max_res"] === "true") {
@@ -240,7 +252,7 @@
         for (let [key, arr] of Object.entries(codecs_data)) {
             if (!arr) {
                 delete codecs_data[key];
-            } else if (["opus", "mp4a"].some((_key) => key == _key)) {
+            } else if (codecs_util.is_audio(key)) {
                 codecs_data[key] = [...new Set(arr).add(key)]; // add default codec name to remain one
                 available_audio_codec++;
             } else {
@@ -257,13 +269,7 @@
 
         // skip if only 1 codec available
         if (available_video_codec > 1) {
-            let codecs_map = {
-                avc: "h264",
-                av1: "av1",
-                vp8: "vp8",
-                vp9: "vp9",
-            };
-            for (let [_key, _name] of Object.entries(codecs_map)) {
+            for (let [_key, _name] of Object.entries(codecs_util.video_map)) {
                 if (localStorage[`enhanced-h264ify-block_${_name}`] === "true") {
                     if (codecs_data[_key]) {
                         disallowed_types.push(...codecs_data[_key]);
@@ -277,11 +283,7 @@
 
         // skip if only 1 codec available
         if (available_audio_codec > 1) {
-            let codecs_map = {
-                opus: "opus",
-                mp4a: "mp4a",
-            };
-            for (let [_key, _name] of Object.entries(codecs_map)) {
+            for (let [_key, _name] of Object.entries(codecs_util.audio_map)) {
                 if (localStorage[`enhanced-h264ify-block_${_name}`] === "true") {
                     if (codecs_data[_key]) {
                         disallowed_types.push(...codecs_data[_key]);

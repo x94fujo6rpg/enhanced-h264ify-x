@@ -13,6 +13,7 @@ download [`enhanced-h264ify-x.zip`](https://github.com/x94fujo6rpg/enhanced-h264
   
 * Install for Firefox:  
 install it on [AMO enhanced-h264ify-x](https://addons.mozilla.org/firefox/addon/enhanced-h264ify-x/) (possible older version because it requires review)  
+or  
 download & load [`enhanced-h264ify-x firefox.zip`](https://github.com/x94fujo6rpg/enhanced-h264ify-x/raw/refs/heads/master/pkg/enhanced-h264ify-x%20firefox.zip) in `about:debugging#/runtime/this-firefox`  
 you need to reinstall it every time you restart firefox  
 because firefox hate dev  
@@ -20,6 +21,16 @@ add-ons won't work properly unless it's verified on AMO
 even though they have fewer staff to do the review process  
 make it take 1 week to few month  
 there's nothing I can do  
+
+* Not Working?
+  * chrome  
+    go to `chrome://extensions`  
+    find extension and click `details`  
+    permissions > allow all  
+  * firefox  
+    goto `about:addons` > `extensions`  
+    find extension and click it  
+    permissions > allow all  
 
 # Improved
 
