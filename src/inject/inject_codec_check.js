@@ -24,9 +24,6 @@
  */
 
 (function () {
-    let last_video_id = false;
-    let last_video_disallowed_types = false;
-
     function override() {
         // Override video element canPlayType() function
         var videoElem = document.createElement("video");
@@ -72,22 +69,24 @@
             }
 
             // only do new extract when current video id is different
-            if (vid == last_video_id) {
+            let last_video_id = sessionData.get_last_id();
+            let last_video_disallowed_types = sessionData.get_last_disallowed();
+            if (vid == last_video_id && last_video_disallowed_types) {
                 // get last extract result if video id is the same
                 disallowed_types = last_video_disallowed_types;
             } else {
+                console.log(`vid change detected. new:[${vid}] old:[${last_video_id}]`);
                 // extract & save new result
                 disallowed_types = get_disallowed_list(vid);
                 if (!disallowed_types) return origChecker(original_type);
-                disallowed_types = new Set(disallowed_types);
-                last_video_disallowed_types = disallowed_types;
+                sessionData.set_last_disallowed(disallowed_types);
             }
+
+            if (!disallowed_types || disallowed_types.length < 1) return origChecker(original_type);
+
+            disallowed_types = new Set(disallowed_types);
 
             // If video type is in disallowed_types, say we don't support them
-            if (disallowed_types.has(type)) {
-                return false;
-            }
-
             // sneaky unlisted format workaround
             if (disallowed_types.has("avc") && type.match(/avc\d+/)) return false;
             if (disallowed_types.has("av1") && type.match(/av\d+/)) return false;
@@ -109,6 +108,35 @@
     }
 
     override();
+
+    const sessionData = {
+        id: {
+            last_id: "enhanced-h264ify-last_id",
+            last_disallowed: "enhanced-h264ify-last_disallowed",
+        },
+        set_last_id(id = "") {
+            if (typeof id === "string" && length < 15) {
+                sessionStorage.setItem(this.id.last_id, id);
+            } else {
+                sessionStorage.removeItem(this.id.last_id);
+            }
+        },
+        set_last_disallowed(list = []) {
+            if (list instanceof Array) {
+                sessionStorage.setItem(this.id.last_disallowed, JSON.stringify(list));
+            } else {
+                sessionStorage.removeItem(this.id.last_disallowed);
+            }
+        },
+        get_last_id() {
+            let id = sessionStorage.getItem(this.id.last_id);
+            return typeof id === "string" && id.length > 0 ? id : false;
+        },
+        get_last_disallowed() {
+            let list = JSON.parse(sessionStorage.getItem(this.id.last_disallowed));
+            return list instanceof Array ? list : false;
+        },
+    };
 
     function get_video_info_sync(vid) {
         if (!vid) {
@@ -219,8 +247,8 @@
         }
 
         // save current video id & reset disallowed_types
-        last_video_id = _vid;
-        last_video_disallowed_types = false;
+        sessionData.set_last_id(_vid);
+        sessionData.set_last_disallowed(false);
 
         let disallowed_types = [];
 

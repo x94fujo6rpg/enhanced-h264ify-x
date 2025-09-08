@@ -34,6 +34,9 @@ don't block if the codec's resolution(360~1080 or highest) is unavailable
 
 # Changelog
 
+2.2.1.15
+* improve capture vid change
+
 2.2.1.14
 * skip not playable video
 
