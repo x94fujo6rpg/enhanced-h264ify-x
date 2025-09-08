@@ -159,8 +159,7 @@
         );
 
         if (request.status == 200) {
-            let response = JSON.parse(request.responseText);
-            return response.streamingData.adaptiveFormats;
+            return JSON.parse(request.responseText);
         } else {
             return false;
         }
@@ -177,19 +176,21 @@
             vp9: 0,
         };
         let max_resolution = 0;
-        if (ytInitialPlayerResponse) {
-            if (ytInitialPlayerResponse.playabilityStatus.status != "OK") {
-                // not playable video like offline live stream
-                return false;
-            }
-            format_data = ytInitialPlayerResponse.streamingData.adaptiveFormats;
-        } else {
-            format_data = get_video_info_sync(_vid);
+        format_data = get_video_info_sync(_vid);
+        if (
+            !format_data ||
+            !format_data.streamingData ||
+            !format_data.streamingData.adaptiveFormats ||
+            !format_data.playabilityStatus ||
+            format_data.playabilityStatus.status != "OK" // not playable video like offline live stream
+        ) {
+            return false;
         }
-        if (!format_data || !format_data.length) return false;
+        format_data = format_data.streamingData.adaptiveFormats;
 
+        let table = [];
         for (let data of format_data) {
-            let { mimeType, height } = data;
+            let { mimeType, width, height, qualityLabel, averageBitrate, bitrate } = data;
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
             if (codecs) {
                 codecs = codecs[1];
@@ -200,9 +201,11 @@
                     if (codecs.match(/^vp8.*/) && resolution_data.vp8 < height) resolution_data.vp8 = height;
                     if (codecs.match(/^vp9.*|^vp09.*/) && resolution_data.vp9 < height) resolution_data.vp9 = height;
                     if (height > max_resolution) max_resolution = height;
+                    table.push({ mimeType, width, height, qualityLabel, averageBitrate, bitrate });
                 }
             }
         }
+        console.table(table);
 
         format_list = [...format_list].join("\n");
 
