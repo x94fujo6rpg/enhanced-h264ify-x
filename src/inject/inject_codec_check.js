@@ -249,14 +249,14 @@
         // remove empty list & count available codec
         let available_video_codec = 0;
         let available_audio_codec = 0;
-        for (let [key, arr] of Object.entries(codecs_data)) {
-            if (!arr) {
+        for (let [key, set] of Object.entries(codecs_data)) {
+            if (set.size == 0) {
                 delete codecs_data[key];
             } else if (codecs_util.is_audio(key)) {
-                codecs_data[key] = [...new Set(arr).add(key)]; // add default codec name to remain one
+                codecs_data[key] = [...set.add(key)]; // add default codec name to remain one
                 available_audio_codec++;
             } else {
-                codecs_data[key] = [...new Set(arr).add(key)]; // add default codec name to remain one
+                codecs_data[key] = [...set.add(key)]; // add default codec name to remain one
                 available_video_codec++;
             }
         }
