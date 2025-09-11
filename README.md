@@ -45,6 +45,10 @@ don't block if the codec's resolution(360~1080 or highest) is unavailable
 
 # Changelog
 
+2.2.1.20
+* only hold last video info for few sec. so it auto reset & retry when reload
+* more log info
+
 2.2.1.19
 * disable loudness option
   * youtube have a button for it now

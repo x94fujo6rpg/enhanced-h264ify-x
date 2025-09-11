@@ -71,7 +71,9 @@
             // only do new extract when current video id is different
             let last_video_id = sessionData.get_last_id();
             let last_video_disallowed_types = sessionData.get_last_disallowed();
-            if (vid == last_video_id && last_video_disallowed_types) {
+            // temp_value expired in few sec, so it auto reset & retry when reload
+            let temp_value = sessionData.get_temp_value();
+            if (vid == last_video_id && last_video_disallowed_types && temp_value) {
                 // get last extract result if video id is the same
                 disallowed_types = last_video_disallowed_types;
             } else {
@@ -109,6 +111,7 @@
         id: {
             last_id: "enhanced-h264ify-last_id",
             last_disallowed: "enhanced-h264ify-last_disallowed",
+            temp_value: "enhanced-h264ify-temp_value",
         },
         set_last_id(id = "") {
             if (typeof id === "string" && length < 15) {
@@ -124,6 +127,10 @@
                 sessionStorage.removeItem(this.id.last_disallowed);
             }
         },
+        set_temp_value() {
+            sessionStorage.setItem(this.id.temp_value, "auto_expired");
+            setTimeout(() => sessionStorage.removeItem(this.id.temp_value), 1000);
+        },
         get_last_id() {
             let id = sessionStorage.getItem(this.id.last_id);
             return typeof id === "string" && id.length > 0 ? id : false;
@@ -131,6 +138,9 @@
         get_last_disallowed() {
             let list = JSON.parse(sessionStorage.getItem(this.id.last_disallowed));
             return list instanceof Array ? list : false;
+        },
+        get_temp_value() {
+            return sessionStorage.getItem(this.id.temp_value);
         },
     };
     const codecs_util = {
@@ -197,6 +207,7 @@
 
     function get_disallowed_list(_vid) {
         let format_data = get_video_info_sync(_vid);
+        let allowed_types = [];
         if (
             !format_data ||
             !format_data.streamingData ||
@@ -217,9 +228,11 @@
             let { mimeType, width, height, qualityLabel, bitrate } = data;
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
             if (codecs) {
+                let codec_key;
                 codecs = codecs[1];
-                let codec_key = codecs_util.get_reg_match(codecs);
+                codec_key = codecs_util.get_reg_match(codecs);
                 codecs_data[codec_key].add(codecs);
+                allowed_types.push(codecs);
                 // video resolution info
                 if (height) {
                     if (height > max_resolution) max_resolution = height;
@@ -260,10 +273,12 @@
                 available_video_codec++;
             }
         }
+        console.log(`available_video_codec:${available_video_codec}, available_audio_codec:${available_audio_codec}`);
 
         // save current video id & reset disallowed_types
         sessionData.set_last_id(_vid);
         sessionData.set_last_disallowed(false);
+        sessionData.set_temp_value();
 
         let disallowed_types = [];
 
@@ -272,13 +287,19 @@
             for (let [_key, _name] of Object.entries(codecs_util.video_map)) {
                 if (localStorage[`enhanced-h264ify-block_${_name}`] === "true") {
                     if (codecs_data[_key]) {
+                        console.log(`blocking ${_key}`);
                         disallowed_types.push(...codecs_data[_key]);
                         available_video_codec--;
                     }
                     // abort when only 1 codec left
-                    if (available_video_codec <= 1) break;
+                    if (available_video_codec <= 1) {
+                        console.log(`no video codec left. skip`);
+                        break;
+                    }
                 }
             }
+        } else {
+            console.log(`only 1 video codec available. skip`);
         }
 
         // skip if only 1 codec available
@@ -286,17 +307,27 @@
             for (let [_key, _name] of Object.entries(codecs_util.audio_map)) {
                 if (localStorage[`enhanced-h264ify-block_${_name}`] === "true") {
                     if (codecs_data[_key]) {
+                        console.log(`blocking ${_key}`);
                         disallowed_types.push(...codecs_data[_key]);
                         available_audio_codec--;
                     }
                     // abort when only 1 codec left
-                    if (available_audio_codec <= 1) break;
+                    if (available_audio_codec <= 1) {
+                        console.log(`no audio codec left. skip`);
+                        break;
+                    }
                 }
             }
+        } else {
+            console.log(`only 1 audio codec available. skip`);
         }
+
+        allowed_types = [...new Set(allowed_types)];
+        allowed_types = allowed_types.filter((c) => !disallowed_types.find((_c) => _c == c));
 
         console.log(`new video id:[${_vid}], codecs_data:`, codecs_data);
         console.log("disallowed_types", disallowed_types);
+        console.log("allowed_types", allowed_types);
 
         return disallowed_types;
     }
