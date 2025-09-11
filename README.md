@@ -45,6 +45,11 @@ don't block if the codec's resolution(360~1080 or highest) is unavailable
 
 # Changelog
 
+2.2.1.19
+* disable loudness option
+  * youtube have a button for it now
+  * it doesn't work & only cause issue
+
 2.2.1.16
 * now only use response data
 

@@ -214,7 +214,7 @@
             max_resolution = 0,
             table = []; // for log
         for (let data of format_data) {
-            let { mimeType, width, height, qualityLabel, averageBitrate, bitrate } = data;
+            let { mimeType, width, height, qualityLabel, bitrate } = data;
             let codecs = mimeType.match(/.+;\s*codecs="(.+)"/);
             if (codecs) {
                 codecs = codecs[1];
@@ -224,7 +224,7 @@
                 if (height) {
                     if (height > max_resolution) max_resolution = height;
                     if (height > resolution_data[codec_key]) resolution_data[codec_key] = height;
-                    table.push({ mimeType, width, height, qualityLabel, averageBitrate, bitrate });
+                    table.push({ codec_key, codecs, mimeType, width, height, qualityLabel, bitrate });
                 }
             }
         }

@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener(async () => {
     id: 'inject',
     js: [
       'src/inject/inject_codec_check.js',
-      'src/inject/inject_ln.js'
+      //'src/inject/inject_ln.js'
     ],
     matches: [
       "*://*.youtube.com/*",
