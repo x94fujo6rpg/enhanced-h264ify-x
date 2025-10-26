@@ -222,6 +222,7 @@
         ) {
             return false;
         }
+        format_data = format_data.streamingData.adaptiveFormats;
 
         // extract codecs & resolution info
         let resolution_data = codecs_util.video_list.reduce((acc, current) => ({...acc, [current]: 0 }), {}),
