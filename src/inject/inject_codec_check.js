@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-(function () {
+(function() {
     function override() {
         // Override video element canPlayType() function
         var videoElem = document.createElement("video");
@@ -41,8 +41,9 @@
     // return a custom MIME type checker that can defer to the original function
     function makeModifiedTypeChecker(origChecker) {
         // Check if a video type is allowed
-        return function (type) {
+        return function(type) {
             let original_type = type;
+            let url = window.location.href;
             let disallowed_types, vid;
             if (type === undefined) {
                 return false;
@@ -55,12 +56,17 @@
                 }
             }
 
+            // https://www.youtube.com/embed/hyperchat_embed
+            if (url.match(/hyperchat_embed/)) {
+                return origChecker(original_type);
+            }
+
             // https://www.youtube.com/watch?v=xxxxx
-            vid = new URL(window.location.href).searchParams.get("v");
+            vid = new URL(url).searchParams.get("v");
             if (!vid) {
-                // https://www.youtube.com//shorts/xxxxx
+                // https://www.youtube.com/shorts/xxxxx
                 // https://www.youtube.com/embed/xxxxxx
-                vid = window.location.href.match(/\/shorts\/([^?]+)/) || window.location.href.match(/\/embed\/([^?]+)/);
+                vid = url.match(/\/shorts\/([^?]+)/) || url.match(/\/embed\/([^?]+)/);
                 if (vid) {
                     vid = vid[1];
                 } else {
@@ -77,7 +83,7 @@
                 // get last extract result if video id is the same
                 disallowed_types = last_video_disallowed_types;
             } else {
-                console.log(`vid change detected. new:[${vid}] old:[${last_video_id}]`);
+                console.log(`vid change detected. new:[${vid}] old:[${last_video_id}] url:[${url}]`);
                 // extract & save new result
                 disallowed_types = get_disallowed_list(vid);
                 if (!disallowed_types) return origChecker(original_type);
@@ -208,8 +214,7 @@
     function get_disallowed_list(_vid) {
         let format_data = get_video_info_sync(_vid);
         let allowed_types = [];
-        if (
-            !format_data ||
+        if (!format_data ||
             !format_data.streamingData ||
             !format_data.streamingData.adaptiveFormats ||
             !format_data.playabilityStatus ||
@@ -217,11 +222,10 @@
         ) {
             return false;
         }
-        format_data = format_data.streamingData.adaptiveFormats;
 
         // extract codecs & resolution info
-        let resolution_data = codecs_util.video_list.reduce((acc, current) => ({ ...acc, [current]: 0 }), {}),
-            codecs_data = codecs_util.all_format.reduce((acc, current) => ({ ...acc, [current]: new Set() }), {}),
+        let resolution_data = codecs_util.video_list.reduce((acc, current) => ({...acc, [current]: 0 }), {}),
+            codecs_data = codecs_util.all_format.reduce((acc, current) => ({...acc, [current]: new Set() }), {}),
             max_resolution = 0,
             table = []; // for log
         for (let data of format_data) {
@@ -231,6 +235,10 @@
                 let codec_key;
                 codecs = codecs[1];
                 codec_key = codecs_util.get_reg_match(codecs);
+                if (!codec_key) {
+                    console.log("unknown codec, pass", { codec_key, data });
+                    continue;
+                }
                 codecs_data[codec_key].add(codecs);
                 allowed_types.push(codecs);
                 // video resolution info
