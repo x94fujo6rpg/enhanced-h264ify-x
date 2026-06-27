@@ -212,7 +212,7 @@
     }
 
     function get_disallowed_list(_vid) {
-        let format_data = get_video_info_sync(_vid);
+        let format_data = window.ytInitialPlayerResponse;
         let allowed_types = [];
         if (!format_data ||
             !format_data.streamingData ||
@@ -220,6 +220,7 @@
             !format_data.playabilityStatus ||
             format_data.playabilityStatus.status != "OK" // not playable video like offline live stream
         ) {
+            console.log("unable to get format data", format_data);
             return false;
         }
         format_data = format_data.streamingData.adaptiveFormats;
