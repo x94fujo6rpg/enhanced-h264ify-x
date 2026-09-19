@@ -34,14 +34,14 @@ there's nothing I can do
 
 # Improved
 
-pull video info & get all available codecs  
+~~pull video info & get all available codecs~~ (v1 api deprecated)  
 auto stop block video codec when only 1 video codec available/left (prevent playback error)  
 auto stop block audio codec when only 1 audio codec available/left (prevent playback error)  
 
-* Optional  
-don't block if the codec's resolution(360~1080 or highest) is unavailable  
+* Resolution Bypass:  
+Abort when target resolution(360~1080 or highest) are not available in final codecs list  
 
-\*youtube don't like you only allowing/force av1  
+Allow only AV1 may cause playback error  
 
 # Changelog
 

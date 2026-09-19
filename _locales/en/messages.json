@@ -36,20 +36,32 @@
     "message": "Block AAC (MP4A)"
   },
 
+  "optionsAV1warn": {
+    "message": "Allow only AV1 may cause playback error"
+  },
+
   "optionsDisableLN": {
     "message": "Disable Loudness Normalization"
   },
 
+  "optionsMaxResDescription": {
+    "message": "Abort when following resolution are not available in final codecs list"
+  },
+
   "optionsMax_res": {
-    "message": "Don't block codec If max resolution is lower than:"
+    "message": "Enable"
   },
 
   "optionsRes_max": {
-    "message": "Highest available(Adaptive)"
+    "message": "Highest available (Adaptive)"
   },
 
   "optionsTitleVideo": {
     "message": "Video"
+  },
+
+  "optionsTitleMaxResBypass": {
+    "message": "Resolution Bypass"
   },
 
   "optionsTitleAudio": {

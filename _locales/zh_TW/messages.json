@@ -36,16 +36,28 @@
     "message": "阻擋 AAC (MP4A)"
   },
 
+  "optionsAV1warn": {
+    "message": "只允許AV1可能導致錯誤 無法播放"
+  },
+
   "optionsDisableLN": {
     "message": "停用響度均衡"
   },
 
+  "optionsMaxResDescription": {
+    "message": "如果以下解析度在阻擋後不可用則放棄阻擋"
+  },
+
   "optionsMax_res": {
-    "message": "停止阻擋如果編碼最高解析度小於:"
+    "message": "啟用"
   },
 
   "optionsRes_max": {
     "message": "最高可用(自適應)"
+  },
+
+  "optionsTitleMaxResBypass": {
+    "message": "修復最高解析度"
   },
 
   "optionsTitleVideo": {

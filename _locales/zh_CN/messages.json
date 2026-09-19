@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "阻擋不想要的Youtube編碼",
+    "message": "阻挡不想要的Youtube编码",
     "description": "Extension description"
   },
 
@@ -9,43 +9,55 @@
   },
 
   "optionsBlock60fps": {
-    "message": "阻擋 60fps"
+    "message": "阻挡 60fps"
   },
 
   "optionsBlockH264": {
-    "message": "阻擋 h264 (AVC)"
+    "message": "阻挡 h264 (AVC)"
   },
 
   "optionsBlockVP8": {
-    "message": "阻擋 VP8"
+    "message": "阻挡 VP8"
   },
 
   "optionsBlockVP9": {
-    "message": "阻擋 VP9"
+    "message": "阻挡 VP9"
   },
 
   "optionsBlockAV1": {
-    "message": "阻擋 AV1"
+    "message": "阻挡 AV1"
   },
 
   "optionsBlockOpus": {
-    "message": "阻擋 Opus"
+    "message": "阻挡 Opus"
   },
 
   "optionsBlockMP4A": {
-    "message": "阻擋 AAC (MP4A)"
+    "message": "阻挡 AAC (MP4A)"
+  },
+
+  "optionsAV1warn": {
+    "message": "只允许AV1可能导致错误 无法播放"
   },
 
   "optionsDisableLN": {
-    "message": "停用響度均衡"
+    "message": "停用响度均衡"
+  },
+
+  "optionsMaxResDescription": {
+    "message": "如果以下解析度在阻挡后不可用则放弃阻挡"
   },
 
   "optionsMax_res": {
-    "message": "停止阻擋如果編碼最高解析度小於:"
+    "message": "启用"
   },
 
   "optionsRes_max": {
-    "message": "最高可用(自適應)"
+    "message": "最高可用(自适应)"
+  },
+
+  "optionsTitleMaxResBypass": {
+    "message": "修复最高解析度"
   },
 
   "optionsTitleVideo": {
@@ -53,6 +65,6 @@
   },
 
   "optionsTitleAudio": {
-    "message": "音訊"
+    "message": "音讯"
   }
 }
